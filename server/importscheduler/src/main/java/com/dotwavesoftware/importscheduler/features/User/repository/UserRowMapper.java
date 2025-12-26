@@ -58,7 +58,7 @@ public class UserRowMapper implements RowMapper<UserEntity> {
                 // Column doesn't exist, that's fine - it means no JOIN was done
             }
             
-            user.setUserRole(userRole);
+        
         }
         
         return user;

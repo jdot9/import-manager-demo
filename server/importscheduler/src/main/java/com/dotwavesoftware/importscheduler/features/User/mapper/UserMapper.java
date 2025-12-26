@@ -13,16 +13,12 @@ public class UserMapper {
             return null;
         }
         
-        String roleName = null;
-        if (userEntity.getUserRole() != null) {
-            roleName = userEntity.getUserRole().getRole();
-        }
+            
         
         return new UserResponseDTO(
             userEntity.getFirstName(),
             userEntity.getLastName(),
-            userEntity.getEmail(),
-            roleName
+            userEntity.getEmail()
         );
     }
     
@@ -36,12 +32,6 @@ public class UserMapper {
         userEntity.setLastName(userResponseDTO.getLastName());
         userEntity.setEmail(userResponseDTO.getEmail());
         
-        // Only set role if provided
-        if (userResponseDTO.getUserRole() != null) {
-            UserRoleEntity userRole = new UserRoleEntity();
-            userRole.setRole(userResponseDTO.getUserRole());
-            userEntity.setUserRole(userRole);
-        }
         
         return userEntity;
     }

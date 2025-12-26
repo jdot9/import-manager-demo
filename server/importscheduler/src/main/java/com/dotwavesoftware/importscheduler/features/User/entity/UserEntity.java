@@ -22,10 +22,6 @@ import com.dotwavesoftware.importscheduler.features.Import.model.entity.ImportEn
 @Table(name="users")
 public class UserEntity extends BaseEntity {
 
-    @ManyToOne
-    @JoinColumn(name="user_role_id")
-    private UserRoleEntity userRole;
-
     @OneToMany(mappedBy="user")
     private List<ConnectionEntity> connections;
 

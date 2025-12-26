@@ -98,7 +98,6 @@ public class UserService {
         
         // Preserve immutable fields - don't allow them to be changed via update
         UserEntity existingUser = existingUserOptional.get();
-        user.setUserRole(existingUser.getUserRole());
         user.setUuid(existingUser.getUuid());
         user.setCreatedAt(existingUser.getCreatedAt());
         
@@ -135,7 +134,6 @@ public class UserService {
         Integer userId = existingUser.getId();
         
         // Preserve immutable fields - don't allow them to be changed via update
-        user.setUserRole(existingUser.getUserRole());
         user.setUuid(existingUser.getUuid());
         user.setCreatedAt(existingUser.getCreatedAt());
         

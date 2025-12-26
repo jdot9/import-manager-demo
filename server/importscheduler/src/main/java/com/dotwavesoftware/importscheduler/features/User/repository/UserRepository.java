@@ -126,7 +126,6 @@ public class UserRepository extends BaseRepository<UserEntity> {
             user.getPassword(),
             user.getOauthProvider(),
             user.getOauthUserId(),
-            user.getUserRole() != null ? user.getUserRole().getId() : null,
             id
         );
         

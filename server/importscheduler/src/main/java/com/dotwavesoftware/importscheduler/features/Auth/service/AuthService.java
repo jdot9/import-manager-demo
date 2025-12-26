@@ -56,11 +56,7 @@ public class AuthService {
         // Generate a simple token (in production, use JWT)
         String token = UUID.randomUUID().toString();
         
-        // Get role name
-        String roleName = null;
-        if (user.getUserRole() != null) {
-            roleName = user.getUserRole().getRole();
-        }
+
         
         // Create response
         return new LoginResponseDTO(
@@ -68,7 +64,6 @@ public class AuthService {
             user.getFirstName(),
             user.getLastName(),
             user.getEmail(),
-            roleName,
             token
         );
     }
