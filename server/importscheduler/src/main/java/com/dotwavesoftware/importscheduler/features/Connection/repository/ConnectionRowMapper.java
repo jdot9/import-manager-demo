@@ -8,8 +8,6 @@ import org.springframework.jdbc.core.RowMapper;
 
 import com.dotwavesoftware.importscheduler.features.Connection.model.entity.ConnectionEntity;
 import com.dotwavesoftware.importscheduler.features.Import.model.entity.ImportEntity;
-import com.dotwavesoftware.importscheduler.features.User.entity.UserEntity;
-import com.dotwavesoftware.importscheduler.features.Api.model.entity.ApiEntity;
 import com.dotwavesoftware.importscheduler.shared.util.ConversionUtil;
 
 public class ConnectionRowMapper implements RowMapper<ConnectionEntity> {
@@ -44,13 +42,7 @@ public class ConnectionRowMapper implements RowMapper<ConnectionEntity> {
             connection.setImportEntity(importEntity);
         }
         
-        int apiId = rs.getInt("api_id");
-        if (!rs.wasNull()) {
-            ApiEntity api = new ApiEntity();
-            api.setId(apiId);
-            connection.setApi(api);
-        }
-
+ 
 
         // Map user_uuid column
         byte[] userUuidBytes = rs.getBytes("user_uuid");

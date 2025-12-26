@@ -25,7 +25,7 @@ public class ConnectionRepository extends BaseRepository<ConnectionEntity> {
 
     @Override
     public int save(ConnectionEntity connection) {
-        String sql = "INSERT INTO connections (uuid, name, description, status, import_id, api_id, user_uuid, created_at) " +
+        String sql = "INSERT INTO connections (uuid, name, description, status, import_id, user_uuid, created_at) " +
                      "VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
         System.out.println(connection.getUser().getUuid());
     
@@ -35,7 +35,7 @@ public class ConnectionRepository extends BaseRepository<ConnectionEntity> {
             connection.getDescription(),
             connection.getStatus(),
             connection.getImportEntity() != null ? connection.getImportEntity().getId() : null,
-            connection.getApi() != null ? connection.getApi().getId() : null,
+          
             // Error: Column uuid cannot be null. 
             connection.getUser() != null ? ConversionUtil.uuidToBytes(connection.getUser().getUuid()) : null
         );
@@ -77,7 +77,6 @@ public class ConnectionRepository extends BaseRepository<ConnectionEntity> {
             connection.getDescription(),
             connection.getStatus(),
             connection.getImportEntity() != null ? connection.getImportEntity().getId() : null,
-            connection.getApi() != null ? connection.getApi().getId() : null,
             connection.getUser() != null ? connection.getUser().getId() : null,
             id
         );

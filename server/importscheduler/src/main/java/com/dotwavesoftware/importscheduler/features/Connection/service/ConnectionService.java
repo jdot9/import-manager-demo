@@ -1,8 +1,6 @@
 package com.dotwavesoftware.importscheduler.features.Connection.service;
 
-import java.sql.Connection;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -13,7 +11,6 @@ import com.dotwavesoftware.importscheduler.features.Connection.model.entity.Conn
 import com.dotwavesoftware.importscheduler.features.Connection.repository.ConnectionRepository;
 import com.dotwavesoftware.importscheduler.features.User.entity.UserEntity;
 import com.dotwavesoftware.importscheduler.features.User.repository.UserRepository;
-import com.dotwavesoftware.importscheduler.shared.util.ConversionUtil;
 
 @Service
 public class ConnectionService {

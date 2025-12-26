@@ -2,27 +2,18 @@ DROP DATABASE IF EXISTS importmanagerdemodb;
 CREATE DATABASE importmanagerdemodb;
 USE importmanagerdemodb;
 
-CREATE TABLE user_roles (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  uuid BINARY(16) NOT NULL UNIQUE,
-  role VARCHAR(255),
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  modified_at TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
 CREATE TABLE users (
   id INT AUTO_INCREMENT PRIMARY KEY,
   uuid BINARY(16) NOT NULL UNIQUE,
   first_name VARCHAR(255),
   last_name VARCHAR(255),
+  oauth_provider VARCHAR(255) UNIQUE,
+  oauth_user_id VARCHAR(255) UNIQUE,
   email VARCHAR(255) UNIQUE,
   password VARCHAR(255),
-  user_role_id INT DEFAULT 2,
   last_login_at DATETIME,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   modified_at TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_role_id) REFERENCES user_roles(id)
-  ON UPDATE CASCADE ON DELETE SET NULL,
       CHECK (
         (email IS NOT NULL AND password IS NOT NULL)
     )
@@ -101,7 +92,6 @@ CREATE TABLE connection_import_mappings (
   FOREIGN KEY (mapping_format_id) REFERENCES mapping_formats(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
-
 CREATE TABLE user_security_questions (
   id INT AUTO_INCREMENT PRIMARY KEY,
   uuid BINARY(16) NOT NULL UNIQUE,
@@ -113,14 +103,10 @@ CREATE TABLE user_security_questions (
   FOREIGN KEY (user_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
-INSERT INTO user_roles (uuid,role)
-VALUES (UUID_TO_BIN(UUID()), 'ADMIN'), (UUID_TO_BIN(UUID()), 'USER'), (UUID_TO_BIN(UUID()), 'GUEST');
-
-INSERT INTO users (uuid, user_role_id, first_name, last_name, email, password)
-VALUES (UUID_TO_BIN(UUID()), 1, 'Jason', 'Dotson', 'djason77@gmail.com', 'walker'); 
+INSERT INTO users (uuid, first_name, last_name, email, password)
+VALUES (UUID_TO_BIN(UUID()), 'Jason', 'Dotson', 'djason77@gmail.com', 'walker'); 
 
 INSERT INTO mapping_formats (uuid, format)
 VALUES (UUID_TO_BIN(UUID()), '##########'),(UUID_TO_BIN(UUID()), '(###)###-####'),(UUID_TO_BIN(UUID()), '###-###-####');
-
 
 select * from users;

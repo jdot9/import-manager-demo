@@ -12,7 +12,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import java.util.List;
-import com.dotwavesoftware.importscheduler.features.Api.model.entity.ApiEntity;
 import com.dotwavesoftware.importscheduler.features.Connection.model.entity.ConnectionEntity;
 import com.dotwavesoftware.importscheduler.features.Import.model.entity.ImportEntity;
 
@@ -26,9 +25,6 @@ public class UserEntity extends BaseEntity {
     @ManyToOne
     @JoinColumn(name="user_role_id")
     private UserRoleEntity userRole;
-
-    @OneToMany(mappedBy="user")
-    private List<ApiEntity> apis;
 
     @OneToMany(mappedBy="user")
     private List<ConnectionEntity> connections;
