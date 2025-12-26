@@ -6,7 +6,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 
 import com.dotwavesoftware.importscheduler.features.User.entity.UserEntity;
-import com.dotwavesoftware.importscheduler.features.User.entity.UserRoleEntity;
+
 import com.dotwavesoftware.importscheduler.shared.util.ConversionUtil;
 
 public class UserRowMapper implements RowMapper<UserEntity> {
@@ -42,24 +42,10 @@ public class UserRowMapper implements RowMapper<UserEntity> {
         Timestamp lastLoginAt = rs.getTimestamp("last_login_at");
         user.setLastLoginAt(ConversionUtil.toLocalDateTime(lastLoginAt));
         
-        // Map UserRole relationship
-        int userRoleId = rs.getInt("user_role_id");
-        if (!rs.wasNull()) {
-            UserRoleEntity userRole = new UserRoleEntity();
-            userRole.setId(userRoleId);
-            
-            // Try to get the role name if it's available from a JOIN
-            try {
-                String roleName = rs.getString("role");
-                if (roleName != null) {
-                    userRole.setRole(roleName);
-                }
-            } catch (SQLException e) {
-                // Column doesn't exist, that's fine - it means no JOIN was done
-            }
+
             
         
-        }
+        
         
         return user;
     }

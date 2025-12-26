@@ -16,6 +16,7 @@ CREATE TABLE users (
   modified_at TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
       CHECK (
         (email IS NOT NULL AND password IS NOT NULL)
+        OR (oauth_provider IS NOT NULL AND oauth_user_id IS NOT NULL)
     )
 );
 

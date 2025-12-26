@@ -3,7 +3,7 @@ package com.dotwavesoftware.importscheduler.features.User.mapper;
 import org.springframework.stereotype.Component;
 import com.dotwavesoftware.importscheduler.features.User.dto.UserResponseDTO;
 import com.dotwavesoftware.importscheduler.features.User.entity.UserEntity;
-import com.dotwavesoftware.importscheduler.features.User.entity.UserRoleEntity;
+
 
 @Component
 public class UserMapper {
