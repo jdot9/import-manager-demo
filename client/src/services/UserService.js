@@ -10,7 +10,35 @@ class UserService {
     const data = await response.json().catch(() => ({}));
     
     if (!response.ok) {
-      const error = new Error(data.message || 'Request failed');
+      // Create user-friendly error messages based on status code
+      let errorMessage = data.message || data.error;
+      
+      if (!errorMessage) {
+        switch (response.status) {
+          case 400:
+            errorMessage = 'Invalid request. Please check your input and try again.';
+            break;
+          case 401:
+            errorMessage = 'Invalid credentials. Please check your email and password.';
+            break;
+          case 403:
+            errorMessage = 'Access denied. You do not have permission to perform this action.';
+            break;
+          case 404:
+            errorMessage = 'The requested resource was not found.';
+            break;
+          case 409:
+            errorMessage = 'This email is already registered. Please use a different email or login.';
+            break;
+          case 500:
+            errorMessage = 'Server error. Please try again later.';
+            break;
+          default:
+            errorMessage = 'Something went wrong. Please try again.';
+        }
+      }
+      
+      const error = new Error(errorMessage);
       error.response = { data, status: response.status };
       throw error;
     }
@@ -44,7 +72,6 @@ class UserService {
           firstName: data.firstName,
           lastName: data.lastName,
           email: data.email,
-          userRole: data.userRole
         };
         
         localStorage.setItem('user', JSON.stringify(userData));
@@ -66,20 +93,38 @@ class UserService {
    * @returns {Promise} Response with created user
    */
   async register(userData) {
+    const response = await fetch(`${API_BASE_URL}/users`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(userData)
+    });
+    
+    // Get response body as text first
+    const responseText = await response.text();
+    
+    // Try to parse as JSON, fallback to raw text
+    let responseBody;
     try {
-      const response = await fetch(`${API_BASE_URL}/users`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(userData)
-      });
-      
-      return await this.handleResponse(response);
-    } catch (error) {
-      console.error('Registration error:', error);
+      responseBody = JSON.parse(responseText);
+    } catch {
+      responseBody = responseText;
+    }
+    
+    if (!response.ok) {
+      const error = new Error(responseBody?.message || 'Registration failed');
+      error.responseBody = responseBody;
       throw error;
     }
+    
+    // Display success response body
+    alert(typeof responseBody === 'object' 
+      ? JSON.stringify(responseBody, null, 2) 
+      : responseBody
+    );
+    
+    return responseBody;
   }
 
   /**
@@ -167,6 +212,73 @@ class UserService {
       return await this.handleResponse(response);
     } catch (error) {
       console.error('Get all users error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get security question for a user by email
+   * @param {string} email - User's email
+   * @returns {Promise} Security question
+   */
+  async getSecurityQuestion(email) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/security-question?email=${encodeURIComponent(email)}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+      
+      return await this.handleResponse(response);
+    } catch (error) {
+      console.error('Get security question error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Verify security answer
+   * @param {string} email - User's email
+   * @param {string} answer - Security answer
+   * @returns {Promise} Verification result
+   */
+  async verifySecurityAnswer(email, answer) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/verify-security-answer`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, answer })
+      });
+      
+      return await this.handleResponse(response);
+    } catch (error) {
+      console.error('Verify security answer error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Reset password
+   * @param {string} email - User's email
+   * @param {string} newPassword - New password
+   * @returns {Promise} Reset result
+   */
+  async resetPassword(email, newPassword) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/reset-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, newPassword })
+      });
+      
+      return await this.handleResponse(response);
+    } catch (error) {
+      console.error('Reset password error:', error);
       throw error;
     }
   }

@@ -1,5 +1,6 @@
 package com.dotwavesoftware.importscheduler.features.Connection.service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -30,13 +31,14 @@ public class ConnectionService {
         logger.info("Getting all connnections for " + uuidString);
         try {
           UUID uuid = UUID.fromString(uuidString);
-          return connectionRepository.findAllConnectionsByUserUuid(uuid);
+          List<ConnectionEntity> connections = connectionRepository.findAllConnectionsByUserUuid(uuid);
+          return connections != null ? connections : Collections.emptyList();
         } catch (IllegalArgumentException e) {
            logger.warning("Failed to process uuid string. " + e);
-           return null;
+           return Collections.emptyList();
         } catch (Exception e) {
            logger.warning("Failed to get connections. " + e);
-           return null;
+           return Collections.emptyList();
         }
     }
 

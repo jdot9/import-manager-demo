@@ -11,11 +11,9 @@ function Navbar() {
     navigate('/login');
   };
 
-  const currentUser = UserService.getCurrentUser();
-
   return (
     <nav className="navbar">
-        <h1 className="navbar-title">Import Manager</h1>
+        <h1 className="navbar-title">Import Manager Demo</h1>
         <ul className="navbar-list">
      
             <li className="navbar-list__item navbar-list__item--right">
@@ -23,18 +21,13 @@ function Navbar() {
                 Logout
               </a>
             </li>
-            <li className="navbar-list__item navbar-list__item--right">
-              {currentUser && (
-                <NavLink className={({isActive}) => (isActive ? "selected" : "")} to="/profile" end>
-                  Profile
-                </NavLink>
-              )}
-            </li>
+
             <li className="navbar-list__item navbar-list__item--right"> 
               <NavLink className={({isActive}) => (isActive ? "selected" : "")} to="/imports" end> 
                 Imports 
               </NavLink> 
             </li>
+
             <li className="navbar-list__item navbar-list__item--right"> 
               <NavLink className={({isActive}) => (isActive ? "selected" : "")} to="/connections" end> 
                 Connections 

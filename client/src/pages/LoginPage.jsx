@@ -181,9 +181,9 @@ function LoginPage() {
           </button>
 
           <div className={styles.footer}>
-            <a href="#" className={styles.link}>
+            <NavLink to="/forgot-password" className={styles.link}>
               Forgot Password?
-            </a>
+            </NavLink>
             <span className={styles.divider}>|</span>
             <NavLink to="/registration" className={styles.link}>
               Create Account

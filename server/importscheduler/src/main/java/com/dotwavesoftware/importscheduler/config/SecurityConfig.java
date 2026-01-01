@@ -93,8 +93,8 @@ public class SecurityConfig {
                     providerId
                 );
                 
-                // Redirect to React frontend with user UUID
-                String redirectUrl = "http://localhost:5173/connections?oauth=success&uuid=" + 
+                // Redirect to React frontend login page to process OAuth
+                String redirectUrl = "http://localhost:5173/login?oauth=success&uuid=" + 
                     URLEncoder.encode(user.getUuid().toString(), StandardCharsets.UTF_8) +
                     "&email=" + URLEncoder.encode(email, StandardCharsets.UTF_8);
                 

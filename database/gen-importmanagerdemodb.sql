@@ -7,7 +7,7 @@ CREATE TABLE users (
   uuid BINARY(16) NOT NULL UNIQUE,
   first_name VARCHAR(255),
   last_name VARCHAR(255),
-  oauth_provider VARCHAR(255) UNIQUE,
+  oauth_provider VARCHAR(255),
   oauth_user_id VARCHAR(255) UNIQUE,
   email VARCHAR(255) UNIQUE,
   password VARCHAR(255),
@@ -105,7 +105,7 @@ CREATE TABLE user_security_questions (
 );
 
 INSERT INTO users (uuid, first_name, last_name, email, password)
-VALUES (UUID_TO_BIN(UUID()), 'Jason', 'Dotson', 'djason77@gmail.com', 'walker'); 
+VALUES (UUID_TO_BIN(UUID()), 'Jason', 'Dotson', 'dotsonjason05@gmail.com', 'walker'); 
 
 INSERT INTO mapping_formats (uuid, format)
 VALUES (UUID_TO_BIN(UUID()), '##########'),(UUID_TO_BIN(UUID()), '(###)###-####'),(UUID_TO_BIN(UUID()), '###-###-####');

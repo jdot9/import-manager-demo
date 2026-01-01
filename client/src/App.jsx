@@ -6,18 +6,19 @@ import './index.css'
 import MainLayout from './components/ui/MainLayout'
 import ImportPage from './pages/ImportPage'
 import LoginPage from './pages/LoginPage'
-import ProfilePage from './pages/ProfilePage'
 import ProtectedRoute from './components/ProtectedRoute'
-import RegistrationPage from './pages/RegistrationPage';
+import RegistrationPage from './pages/RegistrationPage'
+import ForgotPasswordPage from './pages/ForgotPasswordPage'
 
 function App() {
  
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public route - Login */}
+        {/* Public routes */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/registration" element={<RegistrationPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         
         {/* Protected routes - require authentication */}
         <Route
@@ -29,7 +30,6 @@ function App() {
                   <Route path="/" element={<Navigate to="/connections" replace />} />
                   <Route path="/connections" element={<ConnectionPage />} />
                   <Route path="/imports" element={<ImportPage />} />
-                  <Route path="/profile" element={<ProfilePage />} />
                 </Routes>
               </MainLayout>
             </ProtectedRoute>

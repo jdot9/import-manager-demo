@@ -32,15 +32,17 @@ public class UserRepository extends BaseRepository<UserEntity> {
             return 0;
         }
 
-        String sql = "INSERT INTO users (uuid, first_name, last_name, email, password, created_at) " +
-                     "VALUES (?, ?, ?, ?, ?, NOW())";
+        String sql = "INSERT INTO users (uuid, first_name, last_name, email, password, oauth_provider, oauth_user_id, created_at) " +
+                     "VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
         
         int rowsAffected = jdbcTemplate.update(sql, 
             ConversionUtil.uuidToBytes(user.getUuid()),
             user.getFirstName(),
             user.getLastName(),
             user.getEmail(),
-            user.getPassword()
+            user.getPassword(),
+            user.getOauthProvider(),
+            user.getOauthUserId()
         );
         
         logger.info("Saving user to database. Rows affected: " + rowsAffected);
@@ -49,9 +51,7 @@ public class UserRepository extends BaseRepository<UserEntity> {
 
     @Override
     public List<UserEntity> findAll() {
-        String sql = "SELECT users.*, user_roles.role " +
-                     "FROM users " +
-                     "LEFT JOIN user_roles ON users.user_role_id = user_roles.id";
+        String sql = "SELECT * FROM users";
         List<UserEntity> users = jdbcTemplate.query(sql, new UserRowMapper());
         logger.info("Retrieving all users from database. Total users: " + users.size());
         return users;
@@ -59,10 +59,7 @@ public class UserRepository extends BaseRepository<UserEntity> {
 
     @Override
     public Optional<UserEntity> findById(Integer id) {
-        String sql = "SELECT users.*, user_roles.role " +
-                     "FROM users " +
-                     "LEFT JOIN user_roles ON users.user_role_id = user_roles.id " +
-                     "WHERE users.id = ?";
+        String sql = "SELECT * FROM users WHERE id = ?";
         try {
             logger.info("Retrieving user with id " + id + " from database.");
             UserEntity user = jdbcTemplate.queryForObject(sql, new UserRowMapper(), id);
@@ -77,9 +74,8 @@ public class UserRepository extends BaseRepository<UserEntity> {
     }
 
     public Optional<UserEntity> findByEmail(String email) {
-        String sql = "SELECT users.*, user_roles.role " +
+        String sql = "SELECT users.*" +
                      "FROM users " +
-                     "LEFT JOIN user_roles ON users.user_role_id = user_roles.id " +
                      "WHERE users.email = ?";
         try {
             logger.info("Retrieving user with email: " + email);
@@ -95,10 +91,7 @@ public class UserRepository extends BaseRepository<UserEntity> {
     }
 
     public Optional<UserEntity> findByUUID(UUID uuid) {
-        String sql = "SELECT users.*, user_roles.role " +
-                     "FROM users " +
-                     "LEFT JOIN user_roles ON users.user_role_id = user_roles.id " +
-                     "WHERE users.uuid = ?";
+        String sql = "SELECT * FROM users WHERE uuid = ?";
         try {
             logger.info("Retrieving user with UUID: " + uuid);
             UserEntity user = jdbcTemplate.queryForObject(sql, new UserRowMapper(), 
@@ -116,7 +109,7 @@ public class UserRepository extends BaseRepository<UserEntity> {
     @Override
     public int update(UserEntity user, Integer id) {
         String sql = "UPDATE users SET first_name = ?, last_name = ?, email = ?, password = ?, " +
-                     "oauth_provider = ?, oauth_user_id = ?, user_role_id = ?, modified_at = NOW() " +
+                     "oauth_provider = ?, oauth_user_id = ?, modified_at = NOW() " +
                      "WHERE id = ?";
         
         int rowsAffected = jdbcTemplate.update(sql,

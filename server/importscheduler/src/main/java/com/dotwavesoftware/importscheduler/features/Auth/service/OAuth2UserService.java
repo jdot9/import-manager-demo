@@ -1,7 +1,6 @@
 package com.dotwavesoftware.importscheduler.features.Auth.service;
 
 import org.springframework.stereotype.Service;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import com.dotwavesoftware.importscheduler.features.User.repository.UserRepository;
 import com.dotwavesoftware.importscheduler.features.User.entity.UserEntity;
 
@@ -14,11 +13,9 @@ public class OAuth2UserService {
     
     private static final Logger logger = Logger.getLogger(OAuth2UserService.class.getName());
     private final UserRepository userRepository;
-    private final BCryptPasswordEncoder passwordEncoder;
 
-    public OAuth2UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder) {
+    public OAuth2UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
     }
 
     /**
@@ -63,17 +60,19 @@ public class OAuth2UserService {
         newUser.setLastName(lastName != null ? lastName : "");
         newUser.setOauthProvider(provider);
         newUser.setOauthUserId(providerId);
-        
-        // Set a random password (won't be used for OAuth login)
-        newUser.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
+        // No password for OAuth users
         
         int result = userRepository.save(newUser);
         
         if (result > 0) {
             logger.info("OAuth2 user created successfully: " + email);
-            // Fetch the user again to get the ID
+            // Fetch the user again to get the ID and update last login
             Optional<UserEntity> savedUser = userRepository.findByEmail(email);
-            return savedUser.orElse(newUser);
+            if (savedUser.isPresent()) {
+                userRepository.updateLastLogin(savedUser.get().getId());
+                return savedUser.get();
+            }
+            return newUser;
         } else {
             logger.severe("Failed to create OAuth2 user: " + email);
             throw new RuntimeException("Failed to create OAuth2 user");

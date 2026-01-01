@@ -1,10 +1,14 @@
 package com.dotwavesoftware.importscheduler.features.User.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import com.dotwavesoftware.importscheduler.features.User.repository.UserRepository;
+import com.dotwavesoftware.importscheduler.features.User.repository.UserSecurityQuestionRepository;
 import com.dotwavesoftware.importscheduler.features.User.mapper.UserMapper;
+import com.dotwavesoftware.importscheduler.features.User.dto.UserDTO;
 import com.dotwavesoftware.importscheduler.features.User.dto.UserResponseDTO;
 import com.dotwavesoftware.importscheduler.features.User.entity.UserEntity;
+import com.dotwavesoftware.importscheduler.features.User.entity.UserSecurityQuestionEntity;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,32 +22,63 @@ public class UserService {
     private static final Logger logger = Logger.getLogger(UserService.class.getName());
     
     private final UserRepository userRepository;
+    private final UserSecurityQuestionRepository userSecurityQuestionRepository;
     private final UserMapper userMapper;
     private final EmailService emailService;
+    private final BCryptPasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, UserMapper userMapper, EmailService emailService) {
+    public UserService(UserRepository userRepository, UserSecurityQuestionRepository userSecurityQuestionRepository, UserMapper userMapper, EmailService emailService, BCryptPasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.userSecurityQuestionRepository = userSecurityQuestionRepository;
         this.userMapper = userMapper;
         this.emailService = emailService;
+        this.passwordEncoder = passwordEncoder;
     }
 
-    public int createUser(UserEntity user) {
-        logger.info("Creating new user with email: " + user.getEmail());
+    public int createUser(UserDTO userDTO) {
+    
+        UserEntity newUser = new UserEntity();
+        UserSecurityQuestionEntity newUserSecurityQuestion = new UserSecurityQuestionEntity();
+        newUser.setFirstName(userDTO.getFirstName());
+        newUser.setLastName(userDTO.getLastName());
+        newUser.setEmail(userDTO.getEmail());
+        // Hash password before saving
+        if (userDTO.getPassword() != null && !userDTO.getPassword().trim().isEmpty()) {
+            newUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        }
+        newUserSecurityQuestion.setQuestion(userDTO.getSecretQuestion());
+        // Hash security answer before saving
+        if (userDTO.getSecretAnswer() != null && !userDTO.getSecretAnswer().trim().isEmpty()) {
+            newUserSecurityQuestion.setAnswer(passwordEncoder.encode(userDTO.getSecretAnswer()));
+        }
 
-        if (user.getUuid() == null) {
-            user.setUuid(UUID.randomUUID());
+        logger.info("Creating new user with email: " + newUser.getEmail());
+
+        if (newUser.getUuid() == null) {
+            newUser.setUuid(UUID.randomUUID());
         }
         
-        int rowsAffected = userRepository.save(user);
+        int rowsAffected = userRepository.save(newUser);
         
+        // Get the user_id of the newly created user
+        int rowsAffected2 = 0;
         if (rowsAffected > 0) {
+            Optional<UserEntity> savedUser = userRepository.findByUUID(newUser.getUuid());
+            if (savedUser.isPresent()) {
+                newUserSecurityQuestion.setUser(savedUser.get());
+                newUserSecurityQuestion.setUuid(UUID.randomUUID());
+                rowsAffected2 = userSecurityQuestionRepository.save(newUserSecurityQuestion);
+            }
+        }
+        
+        if (rowsAffected > 0 && rowsAffected2 > 0) {
             logger.info("User created successfully. Sending welcome email...");
             // Send welcome email if user has email and first name
-            if (user.getEmail() != null && user.getFirstName() != null) {
-                emailService.sendWelcomeEmail(user.getEmail(), user.getFirstName());
+            if (newUser.getEmail() != null && newUser.getFirstName() != null) {
+                emailService.sendWelcomeEmail(newUser.getEmail(), newUser.getFirstName());
             }
         } else {
-            logger.warning("Failed to create user with the email address: " + user.getEmail());
+            logger.warning("Failed to create user with the email address: " + newUser.getEmail());
         }
         
         return rowsAffected;
@@ -102,9 +137,13 @@ public class UserService {
         user.setCreatedAt(existingUser.getCreatedAt());
         
         // If password is empty/null in the update, keep the existing password
+        // Otherwise hash the new password
         if (user.getPassword() == null || user.getPassword().trim().isEmpty()) {
             user.setPassword(existingUser.getPassword());
             logger.info("Preserving existing password (no new password provided)");
+        } else {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            logger.info("Hashing new password");
         }
         
         logger.info("Preserving immutable fields (userRole, uuid, createdAt) during update");
@@ -138,9 +177,13 @@ public class UserService {
         user.setCreatedAt(existingUser.getCreatedAt());
         
         // If password is empty/null in the update, keep the existing password
+        // Otherwise hash the new password
         if (user.getPassword() == null || user.getPassword().trim().isEmpty()) {
             user.setPassword(existingUser.getPassword());
             logger.info("Preserving existing password (no new password provided)");
+        } else {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            logger.info("Hashing new password");
         }
         
         logger.info("Preserving immutable fields (userRole, uuid, createdAt) during update");

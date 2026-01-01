@@ -2,8 +2,10 @@ package com.dotwavesoftware.importscheduler.features.User.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import com.dotwavesoftware.importscheduler.features.User.dto.UserDTO;
 import com.dotwavesoftware.importscheduler.features.User.dto.UserResponseDTO;
 import com.dotwavesoftware.importscheduler.features.User.entity.UserEntity;
+import com.dotwavesoftware.importscheduler.features.User.entity.UserSecurityQuestionEntity;
 import com.dotwavesoftware.importscheduler.features.User.service.UserService;
 
 import java.util.List;
@@ -31,9 +33,10 @@ public class UserController {
     }
 
     @PostMapping("/users")
-    public ResponseEntity<String> createUser(@RequestBody UserEntity newUser) {
-        String email = newUser.getEmail();
-        int result = userService.createUser(newUser);
+    public ResponseEntity<String> createUser(@RequestBody UserDTO userDTO) {
+
+        String email = userDTO.getEmail();
+        int result = userService.createUser(userDTO);
         if (result < 1) {
             logger.warning("Failed to create user.");
             return ResponseEntity.status(409).body(("Registration failed because a user with this email address already exists: " + email));

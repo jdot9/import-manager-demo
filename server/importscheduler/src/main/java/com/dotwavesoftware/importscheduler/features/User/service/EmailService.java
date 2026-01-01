@@ -62,11 +62,19 @@ public class EmailService {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom("jasontestingemail9@gmail.com");
             message.setTo(to);
-            message.setSubject("Password Reset Request");
-            message.setText("A password reset request has been made for your account. If you did not request this, please contact support at jasontestingemail9@gmail.com.");
+            message.setSubject("Your Password Has Been Reset - Import Manager");
+            message.setText("Hello,\n\n" +
+                          "Your password has been successfully reset.\n\n" +
+                          "If you did not make this change, please contact support immediately at jasontestingemail9@gmail.com.\n\n" +
+                          "For your security, we recommend:\n" +
+                          "- Using a strong, unique password\n" +
+                          "- Not sharing your password with anyone\n" +
+                          "- Enabling two-factor authentication if available\n\n" +
+                          "Best regards,\n" +
+                          "The Import Manager Team");
 
             mailSender.send(message);
-            logger.info("Password reset email sent successfully to " + to);
+            logger.info("Password reset confirmation email sent successfully to " + to);
         } catch (Exception e) {
             logger.warning("Failed to send password reset email to " + to + ": " + e.getMessage());
         }
