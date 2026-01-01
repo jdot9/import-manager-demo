@@ -6,27 +6,14 @@ import ApiService from '../../services/ApiService'
 import PropTypes from 'prop-types'
 import formStyles from '../ui/Form.module.css'
 import ConnectionService from '../../services/ConnectionService'
+import hubspotlogo from '../../assets/Hubspot-Logo.jpg'
+import five9logo from '../../assets/Five9-Logo.jpg'
 
 function SelectedConnectionModal({onBack, onCreate, selectedConnection, userUuid}) {
 
-  const [api, setApi] = useState(null);
-  const [apiEndpoints, setApiEndpoints] = useState([]);
-  // useEffect send GET request to retrieve API by its id
-  useEffect(() => {
-    ApiService.getApiByUuid(selectedConnection).then(data => {
-      console.log('API retrieved:', data);
-      setApi(data);
-    });
-    ApiService.getApiEndpointsByApiId(api?.id).then(data => {
-      console.log('API endpoints retrieved:', data);
-      setApiEndpoints(data);
-    });
-  }, [selectedConnection, api?.id]);
+ 
 
-  const logoSrc = api?.logoUrl 
-    ? `http://localhost:8080/api/logos/${api.logoUrl.replace('Logos/', '')}`
-    : null;
-  console.log('API endpoints:', apiEndpoints);
+
 
   const [formData, setFormData] = useState({
     name: "",
@@ -46,27 +33,23 @@ function SelectedConnectionModal({onBack, onCreate, selectedConnection, userUuid
     e.preventDefault(); // prevent page refresh
     console.log(formData); // form data here
   }
+
+  const selectedConnectionLogo = selectedConnection === "hubspot" ? hubspotlogo : five9logo;
+
   return (
-    <Card title={api?.name} logo={logoSrc}>
+    <Card logo={selectedConnectionLogo}>
     
     <form className={formStyles['form']} action="">
         <div className={formStyles['form-group']}>
             <label htmlFor='name' className={formStyles['form-group__label']}>Name</label>
             <input type='text' id='name' name='name' onChange={handleChange} className={formStyles['form-group__input']} />
         </div>
+
         <div className={formStyles['form-group']}>
             <label htmlFor='description' className={formStyles['form-group__label']}>Description</label>
-            <input type='text' id='description' name='description' onChange={handleChange} className={formStyles['form-group__input']} />
+            <textarea type='text' id='description' name='description' onChange={handleChange} className={formStyles['form-group__input']} />
         </div>
-        <div className={formStyles['form-group']}>
-            <label htmlFor='apiEndpoint' className={formStyles['form-group__label']}>API Endpoint</label>
-            <select name="" id="" className={formStyles['form-group__select']}>
-                {apiEndpoints.map((endpoint) => (
-                    <option key={endpoint.id} value={endpoint.id}>{endpoint.name} ({endpoint.path})</option>
-                ))}
-         
-            </select>
-        </div>
+
     </form>
 
     <TableNavbar>
