@@ -13,9 +13,8 @@ public class UserMapper {
             return null;
         }
         
-            
-        
         return new UserResponseDTO(
+            userEntity.getUuid() != null ? userEntity.getUuid().toString() : null,
             userEntity.getFirstName(),
             userEntity.getLastName(),
             userEntity.getEmail()
@@ -28,10 +27,12 @@ public class UserMapper {
         }
         
         UserEntity userEntity = new UserEntity();
+        if (userResponseDTO.getUuid() != null) {
+            userEntity.setUuid(java.util.UUID.fromString(userResponseDTO.getUuid()));
+        }
         userEntity.setFirstName(userResponseDTO.getFirstName());
         userEntity.setLastName(userResponseDTO.getLastName());
         userEntity.setEmail(userResponseDTO.getEmail());
-        
         
         return userEntity;
     }

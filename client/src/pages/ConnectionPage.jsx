@@ -2,19 +2,22 @@ import { useEffect, useRef, useState, useMemo } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 
 import Table from '../components/ui/Table';
-import { getConnections, deleteConnections } from '../services/ConnectionClient';
+
 import Button from '../components/ui/Button'
 import Toolbar from '../components/ui/Toolbar';
 import Dropdown from '../components/ui/Dropdown';
 import ConnectionTypesModal from '../components/modals/ConnectionTypesModal';
 import UserService from '../services/UserService';
 import ConnectionService from '../services/ConnectionService';
+import hubspotLogo from '../assets/Hubspot-Logo.jpg';
+import five9Logo from '../assets/Five9-Logo.jpg';
+import noLogo from '../assets/nologo.jpg';
 
 function ConnectionPage() {
 
 const [searchParams, setSearchParams] = useSearchParams();
 const navigate = useNavigate();
-const headers = ["Type", "Name", "Created", "Endpoint", "Status"]; 
+const headers = ["Type", "Name", "Created", "Description", "Status"]; 
 const connectionTypeRef = useRef(null); 
 const [modalIsOpen, setModalIsOpen] = useState(false); 
 const [connectionModalIsOpen, setConnectionModalIsOpen] = useState(false);
@@ -33,12 +36,24 @@ const handleSelectedChange = (selectedIds) => {
   console.log("Connection IDs selected:", selectedIds);
 };
 
+// Helper function to get the appropriate logo based on connection data
+const logoStyle = { width: '100%', height: '60px', objectFit: 'contain', display: 'block' };
+
+const getConnectionLogo = (record) => {
+  if (record.hubspotAccessToken) {
+    return <img src={hubspotLogo} alt="HubSpot" style={logoStyle} />;
+  } else if (record.five9Username) {
+    return <img src={five9Logo} alt="Five9" style={logoStyle} />;
+  }
+  return <img src={noLogo} alt="Unknown" style={logoStyle} />;
+};
+
 // Transform data to Table component format
 const transformedData = useMemo(() => {
   return data.map(record => ({
     id: record.id,
     cells: [
-      record.connectionType,
+      getConnectionLogo(record),
       record.name,
       record.createdAt,
       record.description,
@@ -55,6 +70,7 @@ useEffect(() => {
 
   if (oauth === 'success' && uuid && email) {
     console.log('Processing OAuth2 login callback...');
+    console.log('OAuth user UUID:', uuid);
     
     const fetchOAuthUser = async () => {
       try {
@@ -90,11 +106,31 @@ useEffect(() => {
   const user = JSON.parse(localStorage.getItem('user'));
   console.log(user.uuid);
 
-// Get connections from database
-//useEffect(() => getConnections(setData, setLoading, setError, connections, connectionSelectedRef), []);
-useEffect(() => { ConnectionService.getConnectionsForUserByUuid(user.uuid, setLoading).then(d => setData(d)) }, [user.uuid]);
+// Function to refresh connections from database
+const refreshConnections = () => {
+  setLoading(true);
+  ConnectionService.getConnectionsForUserByUuid(user.uuid, setLoading).then(d => setData(d));
+};
 
-//alert(data[0].type);
+// Function to delete selected connections
+const handleDeleteConnections = async () => {
+  if (selectedFromChild.length === 0) {
+    alert('Please select connections to delete');
+    return;
+  }
+  
+  const confirmDelete = window.confirm(`Are you sure you want to delete ${selectedFromChild.length} connection(s)?`);
+  if (!confirmDelete) return;
+  
+  const result = await ConnectionService.deleteConnections(selectedFromChild);
+  if (result.successCount > 0) {
+    refreshConnections();
+    setSelectedFromChild([]);
+  }
+};
+
+// Get connections from database on mount
+useEffect(() => { refreshConnections() }, [user.uuid]);
 
   return (
     
@@ -103,7 +139,7 @@ useEffect(() => { ConnectionService.getConnectionsForUserByUuid(user.uuid, setLo
           {/* Toolbar for Creating and DeletingConnections */}
           <Toolbar title={(loading) ? "Loading Connections..." : `Connections: ${data.length}`}>
               <Button style={{float: 'right'}} 
-                      onClick={(event) => deleteConnections(event, selectedFromChild)}> - Delete Connection</Button>
+                      onClick={handleDeleteConnections}> - Delete Connection</Button>
 
               <Button style={{float: 'right'}} onClick={() => setConnectionModalIsOpen(true)}>+ New Connection</Button>
           </Toolbar>
@@ -117,7 +153,7 @@ useEffect(() => { ConnectionService.getConnectionsForUserByUuid(user.uuid, setLo
             onSelectionChange={handleSelectedChange} 
           />
    
-          {connectionModalIsOpen && <ConnectionTypesModal modalIsOpen={connectionModalIsOpen} setModalIsOpen={setConnectionModalIsOpen} />}
+          {connectionModalIsOpen && <ConnectionTypesModal modalIsOpen={connectionModalIsOpen} setModalIsOpen={setConnectionModalIsOpen} onConnectionSaved={refreshConnections} />}
       </>
   )
 }

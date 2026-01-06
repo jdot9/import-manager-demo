@@ -31,6 +31,15 @@ public class ConnectionEntity extends BaseEntity {
     @Column(name="status")
     private String status;
 
+    @Column(name="five9_username")
+    private String five9Username;
+
+    @Column(name="five9_password")
+    private String five9Password;
+
+    @Column(name="hubspot_access_token")
+    private String hubspotAccessToken;
+
     @ManyToOne
     @JoinColumn(name="import_id")
     private ImportEntity importEntity;

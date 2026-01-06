@@ -25,18 +25,19 @@ public class ConnectionRepository extends BaseRepository<ConnectionEntity> {
 
     @Override
     public int save(ConnectionEntity connection) {
-        String sql = "INSERT INTO connections (uuid, name, description, status, import_id, user_uuid, created_at) " +
-                     "VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
-        System.out.println(connection.getUser().getUuid());
+        String sql = "INSERT INTO connections (uuid, name, description, status, five9_username, five9_password, " +
+                     "hubspot_access_token, import_id, user_uuid, created_at) " +
+                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
     
         int rowsAffected = jdbcTemplate.update(sql,
             ConversionUtil.uuidToBytes(connection.getUuid()),
             connection.getName(),
             connection.getDescription(),
             connection.getStatus(),
+            connection.getFive9Username(),
+            connection.getFive9Password(),
+            connection.getHubspotAccessToken(),
             connection.getImportEntity() != null ? connection.getImportEntity().getId() : null,
-          
-            // Error: Column uuid cannot be null. 
             connection.getUser() != null ? ConversionUtil.uuidToBytes(connection.getUser().getUuid()) : null
         );
         
@@ -69,15 +70,19 @@ public class ConnectionRepository extends BaseRepository<ConnectionEntity> {
     @Override
     public int update(ConnectionEntity connection, Integer id) {
         String sql = "UPDATE connections SET name = ?, description = ?, status = ?, " +
-                     "import_id = ?, api_id = ?, user_id = ?, modified_at = NOW() " +
+                     "five9_username = ?, five9_password = ?, hubspot_access_token = ?, " +
+                     "import_id = ?, user_uuid = ?, modified_at = NOW() " +
                      "WHERE id = ?";
         
         int rowsAffected = jdbcTemplate.update(sql,
             connection.getName(),
             connection.getDescription(),
             connection.getStatus(),
+            connection.getFive9Username(),
+            connection.getFive9Password(),
+            connection.getHubspotAccessToken(),
             connection.getImportEntity() != null ? connection.getImportEntity().getId() : null,
-            connection.getUser() != null ? connection.getUser().getId() : null,
+            connection.getUser() != null ? ConversionUtil.uuidToBytes(connection.getUser().getUuid()) : null,
             id
         );
         

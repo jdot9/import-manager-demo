@@ -13,4 +13,7 @@ public class ConnectionDTO {
     private String name;
     private String description;
     private String userUuid;
+    private String five9Username;
+    private String five9Password;
+    private String hubspotAccessToken;
 }

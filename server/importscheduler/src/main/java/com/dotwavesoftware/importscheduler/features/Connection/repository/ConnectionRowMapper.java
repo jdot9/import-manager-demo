@@ -33,6 +33,9 @@ public class ConnectionRowMapper implements RowMapper<ConnectionEntity> {
         connection.setName(rs.getString("name"));
         connection.setDescription(rs.getString("description"));
         connection.setStatus(rs.getString("status"));
+        connection.setFive9Username(rs.getString("five9_username"));
+        connection.setFive9Password(rs.getString("five9_password"));
+        connection.setHubspotAccessToken(rs.getString("hubspot_access_token"));
         
         // Map foreign key relationships (create minimal objects with just IDs)
         int importId = rs.getInt("import_id");

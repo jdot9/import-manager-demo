@@ -11,7 +11,7 @@ import SelectedConnectionModal from './SelectedConnectionModal'
 import hubspotlogo from '../../assets/Hubspot-Logo.jpg'
 import five9logo from '../../assets/Five9-Logo.jpg'
 
-function ConnectionTypesModal({ modalIsOpen, setModalIsOpen }) {
+function ConnectionTypesModal({ modalIsOpen, setModalIsOpen, onConnectionSaved }) {
 
   const [step, setStep] = useState(0);
   const [selectedConnection, setSelectedConnection] = useState("");
@@ -70,6 +70,8 @@ function ConnectionTypesModal({ modalIsOpen, setModalIsOpen }) {
       <SelectedConnectionModal 
         selectedConnection={selectedConnection}
         onBack={() => setStep(0)}
+        onClose={handleCloseModal}
+        onConnectionSaved={onConnectionSaved}
         userUuid={user.uuid}
       />
     )}
@@ -79,7 +81,8 @@ function ConnectionTypesModal({ modalIsOpen, setModalIsOpen }) {
 
 ConnectionTypesModal.propTypes = {
   modalIsOpen: PropTypes.bool.isRequired,
-  setModalIsOpen: PropTypes.func.isRequired
+  setModalIsOpen: PropTypes.func.isRequired,
+  onConnectionSaved: PropTypes.func
 }
 
 export default ConnectionTypesModal;
